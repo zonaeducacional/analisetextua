@@ -4,7 +4,7 @@ Sua ferramenta completa para análise e aprimoramento de textos, com foco especi
 Esta é uma ferramenta de análise textual completa, desenvolvida em HTML, CSS e JavaScript puros. O objetivo é fornecer a escritores, estudantes e educadores um recurso robusto e de fácil acesso para aprimorar seus textos. A aplicação é totalmente autocontida em um único arquivo HTML, não necessitando de instalação ou configuração de servidor.
 
 Uma de suas principais funcionalidades é a análise de redações baseada nas cinco competências do ENEM, oferecendo um feedback detalhado e uma nota estimada para auxiliar os estudantes em sua preparação.
-
+--------------------------------------------------------------------------------------------------------------------------------------------------
 Nota: Para uma melhor visualização, adicione aqui um screenshot da ferramenta em ação!
 ![Screenshot da Ferramenta](caminho/para/sua/imagem.png)
 

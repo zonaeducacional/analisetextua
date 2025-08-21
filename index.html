@@ -154,412 +154,233 @@ Prof. Sérgio Araújo 2025</p>
             </div>
         </div>
     </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // ... (todo o seu código inicial de declaração de constantes permanece o mesmo) ...
+    const textInput = document.getElementById('text-input');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const resultsPlaceholder = document.getElementById('results-placeholder');
+    const loader = document.getElementById('loader');
+    const resultsDashboard = document.getElementById('results-dashboard');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    const compareBtn = document.getElementById('compare-btn');
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const textInput = document.getElementById('text-input');
-        const analyzeBtn = document.getElementById('analyze-btn');
-        const clearBtn = document.getElementById('clear-btn');
-        const exportBtn = document.getElementById('export-btn');
-        const resultsPlaceholder = document.getElementById('results-placeholder');
-        const loader = document.getElementById('loader');
-        const resultsDashboard = document.getElementById('results-dashboard');
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabPanes = document.querySelectorAll('.tab-pane');
-        const compareBtn = document.getElementById('compare-btn');
+    let keywordChartInstance = null;
+    
+    // Dicionários e listas para análises (permanecem os mesmos)
+    const stopWords = new Set(['de', 'a', 'o', 'que', 'e', 'do', 'da', 'em', 'um', 'para', 'é', 'com', 'não', 'uma', 'os', 'no', 'se', 'na', 'por', 'mais', 'as', 'dos', 'como', 'mas', 'foi', 'ao', 'ele', 'das', 'tem', 'à', 'seu', 'sua', 'ou', 'ser', 'quando', 'muito', 'há', 'nos', 'já', 'está', 'eu', 'também', 'só', 'pelo', 'pela', 'até', 'isso', 'ela', 'entre', 'depois', 'sem', 'mesmo', 'aos', 'ter', 'seus', 'quem', 'nas', 'me', 'esse', 'eles', 'estão', 'você', 'tinha', 'foram', 'essa', 'num', 'nem', 'suas', 'meu', 'às', 'minha', 'têm', 'numa', 'pelos', 'elas', 'havia', 'seja', 'qual', 'será', 'nós', 'tenho', 'lhe', 'deles', 'essas', 'esses', 'pelas', 'este', 'fosse', 'dele', 'tu', 'te', 'vocês', 'vos', 'lhes', 'meus', 'minhas', 'teu', 'tua', 'teus', 'tuas', 'nosso', 'nossa', 'nossos', 'nossas', 'dela', 'delas', 'esta', 'estes', 'estas', 'aquele', 'aquela', 'aqueles', 'aquelas', 'isto', 'aquilo', 'estou', 'está', 'estamos', 'estão', 'estive', 'esteve', 'estivemos', 'estiveram', 'estava', 'estávamos', 'estavam', 'estivera', 'estivéramos', 'esteja', 'estejamos', 'estejam', 'estivesse', 'estivéssemos', 'estivessem', 'estiver', 'estivermos', 'estiverem', 'hei', 'há', 'havemos', 'hão', 'houve', 'houvemos', 'houveram', 'houvera', 'houvéramos', 'haja', 'hajamos', 'hajam', 'houvesse', 'houvéssemos', 'houvessem', 'houver', 'houvermos', 'houverem', 'houverei', 'houverá', 'houveremos', 'houverão', 'houveria', 'houveríamos', 'houveriam', 'sou', 'somos', 'são', 'era', 'éramos', 'eram', 'fui', 'foi', 'fomos', 'foram', 'fora', 'fôramos', 'seja', 'sejamos', 'sejam', 'fosse', 'fôssemos', 'fossem', 'for', 'formos', 'forem', 'serei', 'será', 'seremos', 'serão', 'seria', 'seríamos', 'seriam', 'tenho', 'tem', 'temos', 'tém', 'tinha', 'tínhamos', 'tinham', 'tive', 'teve', 'tivemos', 'tiveram', 'tivera', 'tivéramos', 'tenha', 'tenhamos', 'tenham', 'tivesse', 'tivéssemos', 'tivessem', 'tiver', 'tivermos', 'tiverem', 'terei', 'terá', 'teremos', 'terão', 'teria', 'teríamos', 'teriam']);
+    const positiveWords = new Set(['bom', 'ótimo', 'excelente', 'maravilhoso', 'feliz', 'alegre', 'sucesso', 'amor', 'paz', 'incrível', 'fantástico', 'positivo', 'bem', 'lindo', 'bonito', 'adoro']);
+    const negativeWords = new Set(['ruim', 'péssimo', 'terrível', 'horrível', 'triste', 'raiva', 'ódio', 'medo', 'negativo', 'mal', 'feio', 'odeio', 'problema', 'difícil']);
+    // O spellingDict não é mais necessário para a verificação principal, mas o mantive caso queira usá-lo em outro lugar.
+    const spellingDict = { 'derrepente': 'de repente', /* ... */ };
+    const argumentativeConnectors = ['portanto', 'logo', 'assim', 'desse modo', 'dessa forma', 'consequentemente', 'entretanto', 'porém', 'mas', 'contudo', 'todavia', 'no entanto', 'além disso', 'ademais', 'outrossim', 'igualmente', 'por exemplo', 'isto é', 'ou seja'];
+    const interventionAgents = ['governo', 'ministério', 'mídia', 'imprensa', 'escola', 'instituições de ensino', 'sociedade', 'cidadãos', 'ongs', 'família'];
+    const interventionActions = ['criar', 'implementar', 'fiscalizar', 'promover', 'conscientizar', 'investir', 'desenvolver', 'garantir', 'punir', 'elaborar'];
+    const interventionMeans = ['por meio de', 'através de', 'mediante', 'com o uso de', 'pela criação de'];
+    const interventionPurposes = ['a fim de', 'para que', 'com o objetivo de', 'com o intuito de', 'para'];
+    
+    // Funções de análise (getWords, getSentences, etc. permanecem as mesmas)
+    const getWords = (text) => text.trim().match(/[a-zA-ZÀ-ú]+/g) || [];
+    const getSentences = (text) => text.trim().split(/[.!?]+/).filter(s => s.trim().length > 0);
+    const getParagraphs = (text) => text.trim().split(/\n+/).filter(p => p.trim().length > 0);
+    const countSyllables = (word) => {
+        word = word.toLowerCase();
+        if (word.length <= 3) return 1;
+        word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
+        word = word.replace(/^y/, '');
+        const matches = word.match(/[aeiouy]{1,2}/g);
+        return matches ? matches.length : 0;
+    };
 
-        let keywordChartInstance = null;
+    // MODIFICADO: O Event Listener agora é 'async' para poder usar 'await'
+    analyzeBtn.addEventListener('click', async () => {
+        const text = textInput.value;
+        if (text.trim().length === 0) {
+            alert('Por favor, insira um texto para analisar.');
+            return;
+        }
+        resultsPlaceholder.classList.add('hidden');
+        resultsDashboard.classList.add('hidden');
+        loader.style.display = 'flex';
         
-        // Dicionários e listas para análises
-        const stopWords = new Set(['de', 'a', 'o', 'que', 'e', 'do', 'da', 'em', 'um', 'para', 'é', 'com', 'não', 'uma', 'os', 'no', 'se', 'na', 'por', 'mais', 'as', 'dos', 'como', 'mas', 'foi', 'ao', 'ele', 'das', 'tem', 'à', 'seu', 'sua', 'ou', 'ser', 'quando', 'muito', 'há', 'nos', 'já', 'está', 'eu', 'também', 'só', 'pelo', 'pela', 'até', 'isso', 'ela', 'entre', 'depois', 'sem', 'mesmo', 'aos', 'ter', 'seus', 'quem', 'nas', 'me', 'esse', 'eles', 'estão', 'você', 'tinha', 'foram', 'essa', 'num', 'nem', 'suas', 'meu', 'às', 'minha', 'têm', 'numa', 'pelos', 'elas', 'havia', 'seja', 'qual', 'será', 'nós', 'tenho', 'lhe', 'deles', 'essas', 'esses', 'pelas', 'este', 'fosse', 'dele', 'tu', 'te', 'vocês', 'vos', 'lhes', 'meus', 'minhas', 'teu', 'tua', 'teus', 'tuas', 'nosso', 'nossa', 'nossos', 'nossas', 'dela', 'delas', 'esta', 'estes', 'estas', 'aquele', 'aquela', 'aqueles', 'aquelas', 'isto', 'aquilo', 'estou', 'está', 'estamos', 'estão', 'estive', 'esteve', 'estivemos', 'estiveram', 'estava', 'estávamos', 'estavam', 'estivera', 'estivéramos', 'esteja', 'estejamos', 'estejam', 'estivesse', 'estivéssemos', 'estivessem', 'estiver', 'estivermos', 'estiverem', 'hei', 'há', 'havemos', 'hão', 'houve', 'houvemos', 'houveram', 'houvera', 'houvéramos', 'haja', 'hajamos', 'hajam', 'houvesse', 'houvéssemos', 'houvessem', 'houver', 'houvermos', 'houverem', 'houverei', 'houverá', 'houveremos', 'houverão', 'houveria', 'houveríamos', 'houveriam', 'sou', 'somos', 'são', 'era', 'éramos', 'eram', 'fui', 'foi', 'fomos', 'foram', 'fora', 'fôramos', 'seja', 'sejamos', 'sejam', 'fosse', 'fôssemos', 'fossem', 'for', 'formos', 'forem', 'serei', 'será', 'seremos', 'serão', 'seria', 'seríamos', 'seriam', 'tenho', 'tem', 'temos', 'tém', 'tinha', 'tínhamos', 'tinham', 'tive', 'teve', 'tivemos', 'tiveram', 'tivera', 'tivéramos', 'tenha', 'tenhamos', 'tenham', 'tivesse', 'tivéssemos', 'tivessem', 'tiver', 'tivermos', 'tiverem', 'terei', 'terá', 'teremos', 'terão', 'teria', 'teríamos', 'teriam']);
-        const positiveWords = new Set(['bom', 'ótimo', 'excelente', 'maravilhoso', 'feliz', 'alegre', 'sucesso', 'amor', 'paz', 'incrível', 'fantástico', 'positivo', 'bem', 'lindo', 'bonito', 'adoro']);
-        const negativeWords = new Set(['ruim', 'péssimo', 'terrível', 'horrível', 'triste', 'raiva', 'ódio', 'medo', 'negativo', 'mal', 'feio', 'odeio', 'problema', 'difícil']);
-        const spellingDict = {
-            'derrepente': 'de repente', 'concerteza': 'com certeza', 'denovo': 'de novo', 'agente': 'a gente', 'mecher': 'mexer',
-            'imprecionante': 'impressionante', 'geito': 'jeito', 'menas': 'menos', 'paralização': 'paralisação', 'atravez': 'através',
-            'ascenção': 'ascensão', 'previlégio': 'privilégio', 'derrepente': 'de repente', ' derepente': ' de repente'
-        };
-        const argumentativeConnectors = ['portanto', 'logo', 'assim', 'desse modo', 'dessa forma', 'consequentemente', 'entretanto', 'porém', 'mas', 'contudo', 'todavia', 'no entanto', 'além disso', 'ademais', 'outrossim', 'igualmente', 'por exemplo', 'isto é', 'ou seja'];
-        const interventionAgents = ['governo', 'ministério', 'mídia', 'imprensa', 'escola', 'instituições de ensino', 'sociedade', 'cidadãos', 'ongs', 'família'];
-        const interventionActions = ['criar', 'implementar', 'fiscalizar', 'promover', 'conscientizar', 'investir', 'desenvolver', 'garantir', 'punir', 'elaborar'];
-        const interventionMeans = ['por meio de', 'através de', 'mediante', 'com o uso de', 'pela criação de'];
-        const interventionPurposes = ['a fim de', 'para que', 'com o objetivo de', 'com o intuito de', 'para'];
-
-        // Funções de análise
-        const getWords = (text) => text.trim().match(/[a-zA-ZÀ-ú]+/g) || [];
-        const getSentences = (text) => text.trim().split(/[.!?]+/).filter(s => s.trim().length > 0);
-        const getParagraphs = (text) => text.trim().split(/\n+/).filter(p => p.trim().length > 0);
-        const countSyllables = (word) => {
-            word = word.toLowerCase();
-            if (word.length <= 3) return 1;
-            word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
-            word = word.replace(/^y/, '');
-            const matches = word.match(/[aeiouy]{1,2}/g);
-            return matches ? matches.length : 0;
-        };
-
-        // Event Listeners
-        analyzeBtn.addEventListener('click', () => {
-            const text = textInput.value;
-            if (text.trim().length === 0) {
-                // Em vez de alert, usamos um modal ou uma mensagem inline no futuro. Por enquanto, alert é o mais simples.
-                alert('Por favor, insira um texto para analisar.');
-                return;
-            }
-            resultsPlaceholder.classList.add('hidden');
-            resultsDashboard.classList.add('hidden');
-            loader.style.display = 'flex';
-            setTimeout(() => {
-                runAnalysis(text);
-                loader.style.display = 'none';
-                resultsDashboard.classList.remove('hidden');
-                exportBtn.classList.remove('hidden');
-            }, 500);
-        });
-
-        clearBtn.addEventListener('click', () => {
-            textInput.value = '';
-            resultsDashboard.classList.add('hidden');
-            resultsPlaceholder.classList.remove('hidden');
-            exportBtn.classList.add('hidden');
-            document.getElementById('text-compare-input').value = '';
-            if(document.getElementById('similarity-result')) document.getElementById('similarity-result').classList.add('hidden');
-        });
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                tabPanes.forEach(pane => pane.classList.add('hidden'));
-                document.getElementById(button.dataset.tab).classList.remove('hidden');
-            });
-        });
-        
-        compareBtn.addEventListener('click', () => {
-            const text1 = textInput.value;
-            const text2 = document.getElementById('text-compare-input').value;
-            if (!text1.trim() || !text2.trim()) {
-                alert('Por favor, preencha ambos os campos de texto para comparar.');
-                return;
-            }
-            const words1 = new Set(getWords(text1.toLowerCase()));
-            const words2 = new Set(getWords(text2.toLowerCase()));
-            const intersection = new Set([...words1].filter(word => words2.has(word)));
-            const union = new Set([...words1, ...words2]);
-            const similarity = union.size === 0 ? 0 : (intersection.size / union.size) * 100;
-            const resultDiv = document.getElementById('similarity-result');
-            resultDiv.querySelector('.text-4xl').textContent = `${similarity.toFixed(1)}%`;
-            resultDiv.classList.remove('hidden');
-        });
-
-        exportBtn.addEventListener('click', generateReport);
-
-        function runAnalysis(text) {
-            // Análises Gerais
-            const words = getWords(text);
-            const sentences = getSentences(text);
-            const paragraphs = getParagraphs(text);
-            const wordCount = words.length;
-            
-            // 1. Visão Geral
-            document.getElementById('word-count').textContent = wordCount;
-            document.getElementById('char-count').textContent = text.length;
-            document.getElementById('sentence-count').textContent = sentences.length;
-            document.getElementById('paragraph-count').textContent = paragraphs.length;
-            document.getElementById('reading-time').textContent = `${Math.ceil(wordCount / 200)} min`;
-
-            // 2. Legibilidade
-            if (wordCount > 0 && sentences.length > 0) {
-                const totalSyllables = words.reduce((acc, word) => acc + countSyllables(word), 0);
-                const fleschScore = 248.835 - (1.015 * (wordCount / sentences.length)) - (84.6 * (totalSyllables / wordCount));
-                document.getElementById('flesch-kincaid-score').textContent = `${fleschScore.toFixed(2)} (${getFleschMeaning(fleschScore)})`;
-            } else {
-                 document.getElementById('flesch-kincaid-score').textContent = 'N/A';
-            }
-
-            // 3. Palavras-chave
-            const wordFrequencies = {};
-            words.forEach(word => {
-                const lowerWord = word.toLowerCase();
-                if (!stopWords.has(lowerWord) && lowerWord.length > 2) {
-                    wordFrequencies[lowerWord] = (wordFrequencies[lowerWord] || 0) + 1;
-                }
-            });
-            const sortedKeywords = Object.entries(wordFrequencies).sort((a, b) => b[1] - a[1]).slice(0, 10);
-            updateKeywordChart(sortedKeywords);
-            updateKeywordTable(sortedKeywords, wordCount);
-
-            // 4. Sentimento
-            let score = 0;
-            words.forEach(word => {
-                const lowerWord = word.toLowerCase();
-                if (positiveWords.has(lowerWord)) score++;
-                if (negativeWords.has(lowerWord)) score--;
-            });
-            let sentiment, emoji;
-            if (score > 2) { sentiment = 'Positivo'; emoji = '😊'; }
-            else if (score > 0) { sentiment = 'Levemente Positivo'; emoji = '🙂'; }
-            else if (score < -2) { sentiment = 'Negativo'; emoji = '😞'; }
-            else if (score < 0) { sentiment = 'Levemente Negativo'; emoji = '😕'; }
-            else { sentiment = 'Neutro'; emoji = '😐'; }
-            document.getElementById('sentiment-result').textContent = emoji;
-            document.getElementById('sentiment-score').textContent = sentiment;
-            
-            // 5. Gramática (geral)
-            const grammarSuggestionsDiv = document.getElementById('grammar-suggestions');
-            const suggestions = checkGrammar(text);
-            if (suggestions.length > 0) {
-                grammarSuggestionsDiv.innerHTML = suggestions.map(s => `
-                    <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <p class="text-sm">Possível erro: <strong class="text-red-600">${s.error}</strong></p>
-                        <p class="text-sm">Sugestão: <strong class="text-green-600">${s.suggestion}</strong></p>
-                    </div>
-                `).join('');
-            } else {
-                grammarSuggestionsDiv.innerHTML = '<p class="text-gray-500">Nenhuma sugestão encontrada.</p>';
-            }
-
-            // 6. Análise ENEM
-            runEnemAnalysis(text, { words, sentences, paragraphs, wordFrequencies });
-        }
-
-        // ... (demais funções como getFleschMeaning, updateKeywordChart, etc. permanecem aqui)
-        function getFleschMeaning(score) {
-            if (score >= 90) return "Muito fácil";
-            if (score >= 70) return "Fácil";
-            if (score >= 50) return "Médio";
-            if (score >= 30) return "Difícil";
-            return "Muito difícil";
-        }
-
-        function updateKeywordChart(keywords) {
-            const ctx = document.getElementById('keyword-chart').getContext('2d');
-            const labels = keywords.map(kw => kw[0]);
-            const data = keywords.map(kw => kw[1]);
-
-            if (keywordChartInstance) {
-                keywordChartInstance.destroy();
-            }
-
-            keywordChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Frequência',
-                        data: data,
-                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { x: { beginAtZero: true } }
-                }
-            });
-        }
-
-        function updateKeywordTable(keywords, totalWords) {
-            const tableDiv = document.getElementById('keyword-table');
-            if (keywords.length === 0) {
-                tableDiv.innerHTML = '<p class="text-gray-500">Nenhuma palavra-chave significativa encontrada.</p>';
-                return;
-            }
-            let tableHtml = `<table class="w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Palavra-chave</th><th scope="col" class="px-6 py-3">Ocorrências</th><th scope="col" class="px-6 py-3">Densidade</th></tr></thead><tbody>`;
-            keywords.forEach(([word, count]) => {
-                const density = totalWords > 0 ? ((count / totalWords) * 100).toFixed(2) : 0;
-                tableHtml += `<tr class="bg-white border-b"><th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${word}</th><td class="px-6 py-4">${count}</td><td class="px-6 py-4">${density}%</td></tr>`;
-            });
-            tableHtml += '</tbody></table>';
-            tableDiv.innerHTML = tableHtml;
-        }
-        
-        function checkGrammar(text) {
-            let suggestions = [];
-            const textWords = text.toLowerCase().match(/\b(\w+)\b/g) || [];
-            textWords.forEach(word => {
-                if (spellingDict[word]) {
-                    suggestions.push({ error: word, suggestion: spellingDict[word] });
-                }
-            });
-            // Adicionar mais regras aqui se necessário
-            return suggestions;
-        }
-
-        // NOVA FUNÇÃO: Análise ENEM
-        function runEnemAnalysis(text, metrics) {
-            const { paragraphs, wordFrequencies } = metrics;
-            const lowerText = text.toLowerCase();
-            let totalScore = 0;
-
-            // C1: Norma Culta
-            const c1Errors = checkGrammar(text);
-            let c1Score = 200;
-            if (c1Errors.length > 0) c1Score = Math.max(0, 200 - c1Errors.length * 40);
-            const c1Feedback = c1Errors.length > 0 ? c1Errors.map(e => `Verifique o uso de "${e.error}", talvez quisesse dizer "${e.suggestion}".`) : ["Bom domínio da norma culta."];
-            totalScore += c1Score;
-
-            // C2: Tema, Tese e Repertório
-            let c2Score = 40; // Pontuação base
-            let c2Feedback = [];
-            if (paragraphs.length >= 3) {
-                 c2Score += 80;
-                 c2Feedback.push("Estrutura dissertativa-argumentativa identificada (introdução, desenvolvimento, conclusão).");
-            } else {
-                c2Feedback.push("Atenção: A estrutura do texto não parece seguir o modelo dissertativo-argumentativo padrão de 3 ou mais parágrafos.");
-            }
-            // Simulação de repertório
-            if (lowerText.includes('segundo') || lowerText.includes('filósofo') || lowerText.includes('sociólogo') || lowerText.includes('dados de')) {
-                c2Score += 80;
-                c2Feedback.push("Presença de indícios de repertório sociocultural.");
-            } else {
-                c2Feedback.push("Dica: Enriqueça seu texto com repertório sociocultural (citações, dados, fatos históricos).");
-            }
-            c2Score = Math.min(200, c2Score);
-            totalScore += c2Score;
-
-
-            // C3: Argumentação
-            let c3Score = 0;
-            let c3Feedback = [];
-            const connectorsFound = argumentativeConnectors.filter(c => lowerText.includes(c));
-            if (connectorsFound.length > 5) {
-                c3Score = 200;
-                c3Feedback.push("Bom uso de conectivos para articular as ideias e argumentos.");
-            } else if (connectorsFound.length > 2) {
-                c3Score = 120;
-                c3Feedback.push("Uso razoável de conectivos, mas a argumentação pode ser mais bem articulada.");
-            } else {
-                c3Score = 40;
-                c3Feedback.push("Atenção: Poucos conectivos argumentativos foram encontrados. Busque articular melhor suas ideias.");
-            }
-            totalScore += c3Score;
-
-            // C4: Coesão
-            let c4Score = 200;
-            let c4Feedback = [];
-            const sortedWords = Object.entries(wordFrequencies).sort((a,b) => b[1] - a[1]);
-            if (sortedWords.length > 0 && sortedWords[0][1] > 5) { // Se a palavra mais comum aparece mais de 5 vezes
-                c4Score -= 80;
-                c4Feedback.push(`Atenção à repetição excessiva da palavra "${sortedWords[0][0]}". Use sinônimos.`);
-            }
-            if (connectorsFound.length < 3) {
-                c4Score -= 80;
-                c4Feedback.push("Poucos elementos coesivos. Utilize mais pronomes, advérbios e conjunções para ligar as partes do texto.");
-            }
-            if(c4Feedback.length === 0) c4Feedback.push("Boa utilização dos mecanismos de coesão textual.");
-            c4Score = Math.max(40, c4Score);
-            totalScore += c4Score;
-
-            // C5: Proposta de Intervenção
-            const lastParagraph = paragraphs.length > 0 ? paragraphs[paragraphs.length - 1].toLowerCase() : "";
-            let c5Score = 0;
-            let c5Feedback = [];
-            let elementsFound = new Set();
-            if (interventionAgents.some(a => lastParagraph.includes(a))) { c5Score += 40; elementsFound.add("Agente"); }
-            if (interventionActions.some(a => lastParagraph.includes(a))) { c5Score += 40; elementsFound.add("Ação"); }
-            if (interventionMeans.some(m => lastParagraph.includes(m))) { c5Score += 40; elementsFound.add("Meio/Modo"); }
-            if (interventionPurposes.some(p => lastParagraph.includes(p))) { c5Score += 40; elementsFound.add("Finalidade"); }
-            if (lastParagraph.split(' ').length > 40 && elementsFound.size >= 3) { c5Score += 40; elementsFound.add("Detalhamento"); } // Heurística simples para detalhamento
-            c5Score = Math.min(200, c5Score);
-            c5Feedback.push(`Elementos da proposta encontrados: ${elementsFound.size > 0 ? [...elementsFound].join(', ') : 'Nenhum'}.`);
-            if (elementsFound.size < 5) c5Feedback.push("Lembre-se que uma proposta completa deve conter Agente, Ação, Meio/Modo, Finalidade e Detalhamento.");
-            totalScore += c5Score;
-
-            // Renderiza os resultados
-            const enemResults = [
-                { title: "C1: Domínio da norma culta", score: c1Score, feedback: c1Feedback },
-                { title: "C2: Compreensão do tema e estrutura", score: c2Score, feedback: c2Feedback },
-                { title: "C3: Seleção e organização de argumentos", score: c3Score, feedback: c3Feedback },
-                { title: "C4: Coesão e coerência", score: c4Score, feedback: c4Feedback },
-                { title: "C5: Proposta de intervenção", score: c5Score, feedback: c5Feedback }
-            ];
-            displayEnemResults(enemResults, totalScore);
-        }
-
-        function displayEnemResults(results, totalScore) {
-            const container = document.getElementById('enem');
-            container.innerHTML = ''; // Limpa resultados anteriores
-            
-            const totalScoreHTML = `
-                <div class="text-center mb-4 p-4 bg-blue-50 rounded-lg">
-                    <h3 class="text-xl font-bold text-blue-800">Nota Total Estimada</h3>
-                    <p class="text-5xl font-bold text-blue-600">${totalScore}</p>
-                    <p class="text-sm text-gray-500 mt-1">Lembre-se que esta é uma avaliação automática e simplificada.</p>
-                </div>
-            `;
-            container.innerHTML += totalScoreHTML;
-
-            results.forEach(comp => {
-                let scoreColor = 'text-green-600';
-                if (comp.score < 120) scoreColor = 'text-yellow-600';
-                if (comp.score < 80) scoreColor = 'text-red-600';
-
-                const compHTML = `
-                    <div class="p-4 border border-gray-200 rounded-lg">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-semibold text-gray-800">${comp.title}</h4>
-                            <span class="text-2xl font-bold ${scoreColor}">${comp.score}</span>
-                        </div>
-                        <ul class="mt-2 text-sm text-gray-600 list-disc list-inside space-y-1">
-                            ${comp.feedback.map(f => `<li>${f}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-                container.innerHTML += compHTML;
-            });
-        }
-
-        function generateReport() {
-            const text = textInput.value;
-            let report = `Relatório de Análise Textual\n=================================\n\nTexto Original:\n----------------\n${text}\n\n`;
-            
-            // Visão Geral
-            report += `Visão Geral:\n----------------\n`;
-            report += `- Palavras: ${document.getElementById('word-count').textContent}\n- Caracteres: ${document.getElementById('char-count').textContent}\n- Sentenças: ${document.getElementById('sentence-count').textContent}\n- Parágrafos: ${document.getElementById('paragraph-count').textContent}\n- Tempo de Leitura: ${document.getElementById('reading-time').textContent}\n\n`;
-            
-            // Análise ENEM
-            report += `Análise ENEM:\n----------------\n`;
-            const enemResultsContainer = document.getElementById('enem');
-            const totalScore = enemResultsContainer.querySelector('.text-5xl')?.textContent || 'N/A';
-            report += `Nota Total Estimada: ${totalScore}\n`;
-            enemResultsContainer.querySelectorAll('.border').forEach(compDiv => {
-                const title = compDiv.querySelector('h4').textContent;
-                const score = compDiv.querySelector('span').textContent;
-                const feedbackItems = Array.from(compDiv.querySelectorAll('li')).map(li => `- ${li.textContent}`).join('\n');
-                report += `\n${title}: ${score}\n${feedbackItems}\n`;
-            });
-
-            // ... (outras seções do relatório podem ser adicionadas aqui)
-
-            const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'relatorio_analise_textual.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-        
-        // Funções de formatação
-        function formatText(type) {
-            const textInput = document.getElementById('text-input');
-            let text = textInput.value;
-            switch(type) {
-                case 'uppercase': text = text.toUpperCase(); break;
-                case 'lowercase': text = text.toLowerCase(); break;
-                case 'sentencecase': text = text.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase()); break;
-                case 'removeextraspaces': text = text.replace(/\s+/g, ' ').trim(); break;
-            }
-            textInput.value = text;
-        }
+        // Usamos um setTimeout pequeno para garantir que o loader apareça na tela antes do processamento pesado
+        setTimeout(async () => {
+            await runAnalysis(text); // MODIFICADO: Chamada com await
+            loader.style.display = 'none';
+            resultsDashboard.classList.remove('hidden');
+            exportBtn.classList.remove('hidden');
+        }, 100); // Apenas 100ms para renderizar o loader
     });
-    </script>
+
+    // ... (clearBtn, tabButtons, compareBtn e exportBtn listeners permanecem os mesmos) ...
+    clearBtn.addEventListener('click', () => { textInput.value = ''; resultsDashboard.classList.add('hidden'); resultsPlaceholder.classList.remove('hidden'); exportBtn.classList.add('hidden'); document.getElementById('text-compare-input').value = ''; if(document.getElementById('similarity-result')) document.getElementById('similarity-result').classList.add('hidden'); });
+    tabButtons.forEach(button => { button.addEventListener('click', () => { tabButtons.forEach(btn => btn.classList.remove('active')); button.classList.add('active'); tabPanes.forEach(pane => pane.classList.add('hidden')); document.getElementById(button.dataset.tab).classList.remove('hidden'); }); });
+    compareBtn.addEventListener('click', () => { const text1 = textInput.value; const text2 = document.getElementById('text-compare-input').value; if (!text1.trim() || !text2.trim()) { alert('Por favor, preencha ambos os campos de texto para comparar.'); return; } const words1 = new Set(getWords(text1.toLowerCase())); const words2 = new Set(getWords(text2.toLowerCase())); const intersection = new Set([...words1].filter(word => words2.has(word))); const union = new Set([...words1, ...words2]); const similarity = union.size === 0 ? 0 : (intersection.size / union.size) * 100; const resultDiv = document.getElementById('similarity-result'); resultDiv.querySelector('.text-4xl').textContent = `${similarity.toFixed(1)}%`; resultDiv.classList.remove('hidden'); });
+    exportBtn.addEventListener('click', generateReport);
+
+
+    // MODIFICADO: A função principal de análise agora é 'async'
+    async function runAnalysis(text) {
+        // Análises Gerais
+        const words = getWords(text);
+        const sentences = getSentences(text);
+        const paragraphs = getParagraphs(text);
+        const wordCount = words.length;
+        
+        // 1. Visão Geral (sem alteração)
+        document.getElementById('word-count').textContent = wordCount;
+        document.getElementById('char-count').textContent = text.length;
+        document.getElementById('sentence-count').textContent = sentences.length;
+        document.getElementById('paragraph-count').textContent = paragraphs.length;
+        document.getElementById('reading-time').textContent = `${Math.ceil(wordCount / 200)} min`;
+
+        // 2. Legibilidade (sem alteração)
+        if (wordCount > 0 && sentences.length > 0) {
+            const totalSyllables = words.reduce((acc, word) => acc + countSyllables(word), 0);
+            const fleschScore = 248.835 - (1.015 * (wordCount / sentences.length)) - (84.6 * (totalSyllables / wordCount));
+            document.getElementById('flesch-kincaid-score').textContent = `${fleschScore.toFixed(2)} (${getFleschMeaning(fleschScore)})`;
+        } else {
+            document.getElementById('flesch-kincaid-score').textContent = 'N/A';
+        }
+
+        // 3. Palavras-chave (sem alteração)
+        const wordFrequencies = {};
+        words.forEach(word => {
+            const lowerWord = word.toLowerCase();
+            if (!stopWords.has(lowerWord) && lowerWord.length > 2) {
+                wordFrequencies[lowerWord] = (wordFrequencies[lowerWord] || 0) + 1;
+            }
+        });
+        const sortedKeywords = Object.entries(wordFrequencies).sort((a, b) => b[1] - a[1]).slice(0, 10);
+        updateKeywordChart(sortedKeywords);
+        updateKeywordTable(sortedKeywords, wordCount);
+
+        // 4. Sentimento (sem alteração)
+        let score = 0;
+        words.forEach(word => {
+            const lowerWord = word.toLowerCase();
+            if (positiveWords.has(lowerWord)) score++;
+            if (negativeWords.has(lowerWord)) score--;
+        });
+        let sentiment, emoji;
+        if (score > 2) { sentiment = 'Positivo'; emoji = '😊'; }
+        else if (score > 0) { sentiment = 'Levemente Positivo'; emoji = '🙂'; }
+        else if (score < -2) { sentiment = 'Negativo'; emoji = '😞'; }
+        else if (score < 0) { sentiment = 'Levemente Negativo'; emoji = '😕'; }
+        else { sentiment = 'Neutro'; emoji = '😐'; }
+        document.getElementById('sentiment-result').textContent = emoji;
+        document.getElementById('sentiment-score').textContent = sentiment;
+        
+        // 5. Gramática (MODIFICADO para usar 'await' e renderizar resultados mais ricos)
+        const grammarSuggestionsDiv = document.getElementById('grammar-suggestions');
+        const suggestions = await checkGrammar(text); // MODIFICADO: 'await' é usado aqui
+        if (suggestions.length > 0) {
+            grammarSuggestionsDiv.innerHTML = suggestions.map(s => `
+                <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm">
+                    <p class="font-semibold text-gray-800">${s.message}</p>
+                    <p class="text-gray-600 mt-1">No trecho: <em class="text-red-600">"...${s.context.text.substring(0, s.context.offset)}<span class="font-bold underline">${s.context.text.substring(s.context.offset, s.context.offset + s.context.length)}</span>${s.context.text.substring(s.context.offset + s.context.length)}..."</em></p>
+                    ${s.replacements.length > 0 ? `<p class="mt-1">Sugestão: <strong class="text-green-600">${s.replacements[0].value}</strong></p>` : ''}
+                </div>
+            `).join('');
+        } else {
+            grammarSuggestionsDiv.innerHTML = '<p class="text-gray-500">Ótimo! Nenhuma sugestão de correção encontrada.</p>';
+        }
+
+        // 6. Análise ENEM (MODIFICADO para usar as sugestões da API na C1)
+        runEnemAnalysis(text, { words, sentences, paragraphs, wordFrequencies, grammarErrors: suggestions });
+    }
+
+    // ... (getFleschMeaning, updateKeywordChart, updateKeywordTable permanecem os mesmos) ...
+    function getFleschMeaning(score) { if (score >= 90) return "Muito fácil"; if (score >= 70) return "Fácil"; if (score >= 50) return "Médio"; if (score >= 30) return "Difícil"; return "Muito difícil"; }
+    function updateKeywordChart(keywords) { const ctx = document.getElementById('keyword-chart').getContext('2d'); const labels = keywords.map(kw => kw[0]); const data = keywords.map(kw => kw[1]); if (keywordChartInstance) { keywordChartInstance.destroy(); } keywordChartInstance = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Frequência', data: data, backgroundColor: 'rgba(59, 130, 246, 0.5)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } } }); }
+    function updateKeywordTable(keywords, totalWords) { const tableDiv = document.getElementById('keyword-table'); if (keywords.length === 0) { tableDiv.innerHTML = '<p class="text-gray-500">Nenhuma palavra-chave significativa encontrada.</p>'; return; } let tableHtml = `<table class="w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th scope="col" class="px-6 py-3">Palavra-chave</th><th scope="col" class="px-6 py-3">Ocorrências</th><th scope="col" class="px-6 py-3">Densidade</th></tr></thead><tbody>`; keywords.forEach(([word, count]) => { const density = totalWords > 0 ? ((count / totalWords) * 100).toFixed(2) : 0; tableHtml += `<tr class="bg-white border-b"><th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${word}</th><td class="px-6 py-4">${count}</td><td class="px-6 py-4">${density}%</td></tr>`; }); tableHtml += '</tbody></table>'; tableDiv.innerHTML = tableHtml; }
+
+    // NOVO: Função de verificação de gramática usando a API LanguageTool
+    async function checkGrammar(text) {
+        const apiUrl = 'https://api.languagetool.org/v2/check';
+        
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `text=${encodeURIComponent(text)}&language=pt-BR`
+            });
+
+            if (!response.ok) {
+                console.error('Erro na API LanguageTool:', response.statusText);
+                return []; // Retorna vazio se houver erro na API
+            }
+
+            const data = await response.json();
+            return data.matches; // A API retorna um array de 'matches' (erros encontrados)
+
+        } catch (error) {
+            console.error('Não foi possível conectar à API de verificação gramatical.', error);
+            // Retorna um erro customizado para o usuário saber que a verificação falhou
+            return [{
+                message: 'A verificação de gramática falhou. Verifique sua conexão com a internet.',
+                context: { text: '', offset: 0, length: 0 },
+                replacements: []
+            }];
+        }
+    }
+
+    // MODIFICADO: Função runEnemAnalysis agora recebe os erros da API
+    function runEnemAnalysis(text, metrics) {
+        const { paragraphs, wordFrequencies, grammarErrors } = metrics; // grammarErrors vem da API
+        const lowerText = text.toLowerCase();
+        let totalScore = 0;
+
+        // C1: Norma Culta - Agora usa a contagem de erros da API, que é mais precisa
+        const c1Errors = grammarErrors;
+        let c1Score = 200;
+        // Lógica de pontuação mais refinada: pequenos desvios não penalizam tanto.
+        if (c1Errors.length > 5) {
+            c1Score = 40;
+        } else if (c1Errors.length > 3) {
+            c1Score = 80;
+        } else if (c1Errors.length > 1) {
+            c1Score = 120;
+        } else if (c1Errors.length === 1) {
+            c1Score = 160;
+        }
+        
+        const c1Feedback = c1Errors.length > 0 
+            ? c1Errors.map(e => `${e.message} (no trecho: "...${e.context.text}...")`) 
+            : ["Excelente domínio da norma culta."];
+        totalScore += c1Score;
+
+        // C2, C3, C4, C5 (lógica original mantida, pois não depende da verificação gramatical)
+        // C2: Tema, Tese e Repertório
+        let c2Score = 40; let c2Feedback = []; if (paragraphs.length >= 3) { c2Score += 80; c2Feedback.push("Estrutura dissertativa-argumentativa identificada (introdução, desenvolvimento, conclusão)."); } else { c2Feedback.push("Atenção: A estrutura do texto não parece seguir o modelo dissertativo-argumentativo padrão de 3 ou mais parágrafos."); } if (lowerText.includes('segundo') || lowerText.includes('filósofo') || lowerText.includes('sociólogo') || lowerText.includes('dados de')) { c2Score += 80; c2Feedback.push("Presença de indícios de repertório sociocultural."); } else { c2Feedback.push("Dica: Enriqueça seu texto com repertório sociocultural (citações, dados, fatos históricos)."); } c2Score = Math.min(200, c2Score); totalScore += c2Score;
+        // C3: Argumentação
+        let c3Score = 0; let c3Feedback = []; const connectorsFound = argumentativeConnectors.filter(c => lowerText.includes(c)); if (connectorsFound.length > 5) { c3Score = 200; c3Feedback.push("Bom uso de conectivos para articular as ideias e argumentos."); } else if (connectorsFound.length > 2) { c3Score = 120; c3Feedback.push("Uso razoável de conectivos, mas a argumentação pode ser mais bem articulada."); } else { c3Score = 40; c3Feedback.push("Atenção: Poucos conectivos argumentativos foram encontrados. Busque articular melhor suas ideias."); } totalScore += c3Score;
+        // C4: Coesão
+        let c4Score = 200; let c4Feedback = []; const sortedWords = Object.entries(wordFrequencies).sort((a,b) => b[1] - a[1]); if (sortedWords.length > 0 && sortedWords[0][1] > 5) { c4Score -= 80; c4Feedback.push(`Atenção à repetição excessiva da palavra "${sortedWords[0][0]}". Use sinônimos.`); } if (connectorsFound.length < 3) { c4Score -= 80; c4Feedback.push("Poucos elementos coesivos. Utilize mais pronomes, advérbios e conjunções para ligar as partes do texto."); } if(c4Feedback.length === 0) c4Feedback.push("Boa utilização dos mecanismos de coesão textual."); c4Score = Math.max(40, c4Score); totalScore += c4Score;
+        // C5: Proposta de Intervenção
+        const lastParagraph = paragraphs.length > 0 ? paragraphs[paragraphs.length - 1].toLowerCase() : ""; let c5Score = 0; let c5Feedback = []; let elementsFound = new Set(); if (interventionAgents.some(a => lastParagraph.includes(a))) { c5Score += 40; elementsFound.add("Agente"); } if (interventionActions.some(a => lastParagraph.includes(a))) { c5Score += 40; elementsFound.add("Ação"); } if (interventionMeans.some(m => lastParagraph.includes(m))) { c5Score += 40; elementsFound.add("Meio/Modo"); } if (interventionPurposes.some(p => lastParagraph.includes(p))) { c5Score += 40; elementsFound.add("Finalidade"); } if (lastParagraph.split(' ').length > 40 && elementsFound.size >= 3) { c5Score += 40; elementsFound.add("Detalhamento"); } c5Score = Math.min(200, c5Score); c5Feedback.push(`Elementos da proposta encontrados: ${elementsFound.size > 0 ? [...elementsFound].join(', ') : 'Nenhum'}.`); if (elementsFound.size < 5) c5Feedback.push("Lembre-se que uma proposta completa deve conter Agente, Ação, Meio/Modo, Finalidade e Detalhamento."); totalScore += c5Score;
+
+        // Renderiza os resultados
+        const enemResults = [
+            { title: "C1: Domínio da norma culta", score: c1Score, feedback: c1Feedback },
+            { title: "C2: Compreensão do tema e estrutura", score: c2Score, feedback: c2Feedback },
+            { title: "C3: Seleção e organização de argumentos", score: c3Score, feedback: c3Feedback },
+            { title: "C4: Coesão e coerência", score: c4Score, feedback: c4Feedback },
+            { title: "C5: Proposta de intervenção", score: c5Score, feedback: c5Feedback }
+        ];
+        displayEnemResults(enemResults, totalScore);
+    }
+
+    // ... (displayEnemResults, generateReport e formatText permanecem os mesmos) ...
+    function displayEnemResults(results, totalScore) { const container = document.getElementById('enem'); container.innerHTML = ''; const totalScoreHTML = ` <div class="text-center mb-4 p-4 bg-blue-50 rounded-lg"> <h3 class="text-xl font-bold text-blue-800">Nota Total Estimada</h3> <p class="text-5xl font-bold text-blue-600">${totalScore}</p> <p class="text-sm text-gray-500 mt-1">Lembre-se que esta é uma avaliação automática e simplificada.</p> </div> `; container.innerHTML += totalScoreHTML; results.forEach(comp => { let scoreColor = 'text-green-600'; if (comp.score < 120) scoreColor = 'text-yellow-600'; if (comp.score < 80) scoreColor = 'text-red-600'; const compHTML = ` <div class="p-4 border border-gray-200 rounded-lg"> <div class="flex justify-between items-center"> <h4 class="font-semibold text-gray-800">${comp.title}</h4> <span class="text-2xl font-bold ${scoreColor}">${comp.score}</span> </div> <ul class="mt-2 text-sm text-gray-600 list-disc list-inside space-y-1"> ${comp.feedback.map(f => `<li>${f}</li>`).join('')} </ul> </div> `; container.innerHTML += compHTML; }); }
+    function generateReport() { const text = textInput.value; let report = `Relatório de Análise Textual\n=================================\n\nTexto Original:\n----------------\n${text}\n\n`; report += `Visão Geral:\n----------------\n`; report += `- Palavras: ${document.getElementById('word-count').textContent}\n- Caracteres: ${document.getElementById('char-count').textContent}\n- Sentenças: ${document.getElementById('sentence-count').textContent}\n- Parágrafos: ${document.getElementById('paragraph-count').textContent}\n- Tempo de Leitura: ${document.getElementById('reading-time').textContent}\n\n`; report += `Análise ENEM:\n----------------\n`; const enemResultsContainer = document.getElementById('enem'); const totalScore = enemResultsContainer.querySelector('.text-5xl')?.textContent || 'N/A'; report += `Nota Total Estimada: ${totalScore}\n`; enemResultsContainer.querySelectorAll('.p-4.border').forEach(compDiv => { const title = compDiv.querySelector('h4').textContent; const score = compDiv.querySelector('span').textContent; const feedbackItems = Array.from(compDiv.querySelectorAll('li')).map(li => `- ${li.textContent}`).join('\n'); report += `\n${title}: ${score}\n${feedbackItems}\n`; }); const blob = new Blob([report], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'relatorio_analise_textual.txt'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); }
+    function formatText(type) { const textInput = document.getElementById('text-input'); let text = textInput.value; switch(type) { case 'uppercase': text = text.toUpperCase(); break; case 'lowercase': text = text.toLowerCase(); break; case 'sentencecase': text = text.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase()); break; case 'removeextraspaces': text = text.replace(/\s+/g, ' ').trim(); break; } textInput.value = text; }
+});
+</script>
 </body>
 </html>

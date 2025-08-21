@@ -1,12 +1,61 @@
-Ferramenta de Análise Textual AvançadaSua ferramenta completa para análise e aprimoramento de textos, com foco especial na redação do ENEM.Esta é uma ferramenta de análise textual completa, desenvolvida em HTML, CSS e JavaScript puros. O objetivo é fornecer a escritores, estudantes e educadores um recurso robusto e de fácil acesso para aprimorar seus textos. A aplicação é totalmente autocontida em um único arquivo HTML, não necessitando de instalação ou configuração de servidor.Uma de suas principais funcionalidades é a análise de redações baseada nas cinco competências do ENEM, oferecendo um feedback detalhado e uma nota estimada para auxiliar os estudantes em sua preparação.Nota: Para uma melhor visualização, adicione aqui um screenshot da ferramenta em ação!![Screenshot da Ferramenta](caminho/para/sua/imagem.png)✨ FuncionalidadesVisão Geral Completa: Contagem de palavras, caracteres, sentenças e parágrafos.Tempo de Leitura: Estimativa de quanto tempo levará a leitura do texto.Análise de Legibilidade: Cálculo do índice Flesch-Kincaid (adaptado para o português) para medir a clareza do texto.Densidade de Palavras-chave: Identifica os termos mais frequentes e exibe os dados em um gráfico e uma tabela.Análise de Sentimento: Uma avaliação básica do tom emocional do texto (Positivo, Negativo, Neutro).Verificação Ortográfica: Sugestões para erros de ortografia comuns.Análise ENEM: Uma avaliação detalhada baseada nas 5 competências da redação do ENEM, com pontuação estimada e feedback para cada uma.Comparador de Textos: Calcula a porcentagem de similaridade entre dois textos.Ferramentas de Limpeza: Funções para formatar o texto (maiúsculas, minúsculas, etc.) e remover espaços extras.Exportação de Relatório: Gera um arquivo .txt com um resumo completo da análise.🛠️ Como UsarComo esta é uma aplicação web autocontida, usá-la é muito simples:Faça o download do arquivo .html do projeto.Abra este arquivo em qualquer navegador de internet moderno (Google Chrome, Mozilla Firefox, Microsoft Edge, etc.).Pronto! A ferramenta já está funcionando e pronta para analisar seus textos.💻 Tecnologias UtilizadasHTML5: Estrutura da página.Tailwind CSS: Framework CSS para estilização rápida e responsiva.JavaScript (ES6+): Lógica e funcionalidades da aplicação.Chart.js: Biblioteca para a criação de gráficos.🤝 ContribuiçõesContribuições são muito bem-vindas! Se você tem sugestões para melhorar a ferramenta, sinta-se à vontade para abrir uma "issue" ou enviar um "pull request" no repositório do GitHub.📄 LicençaEste projeto está sob a licença MIT.👤 AutorSérgio [Seu Sobrenome][Link para seu GitHub][Link para seu LinkedIn ou outra rede social]
-  @media print {
-    .ms-editor-squiggler {
-        display:none !important;
-    }
-  }
-  .ms-editor-squiggler {
-    all: initial;
-    display: block !important;
-    height: 0px !important;
-    width: 0px !important;
-  }
+Ferramenta de Análise Textual Avançada
+Sua ferramenta completa para análise e aprimoramento de textos, com foco especial na redação do ENEM.
+
+Esta é uma ferramenta de análise textual completa, desenvolvida em HTML, CSS e JavaScript puros. O objetivo é fornecer a escritores, estudantes e educadores um recurso robusto e de fácil acesso para aprimorar seus textos. A aplicação é totalmente autocontida em um único arquivo HTML, não necessitando de instalação ou configuração de servidor.
+
+Uma de suas principais funcionalidades é a análise de redações baseada nas cinco competências do ENEM, oferecendo um feedback detalhado e uma nota estimada para auxiliar os estudantes em sua preparação.
+
+Nota: Para uma melhor visualização, adicione aqui um screenshot da ferramenta em ação!
+![Screenshot da Ferramenta](caminho/para/sua/imagem.png)
+
+✨ Funcionalidades
+Visão Geral Completa: Contagem de palavras, caracteres, sentenças e parágrafos.
+
+Tempo de Leitura: Estimativa de quanto tempo levará a leitura do texto.
+
+Análise de Legibilidade: Cálculo do índice Flesch-Kincaid (adaptado para o português) para medir a clareza do texto.
+
+Densidade de Palavras-chave: Identifica os termos mais frequentes e exibe os dados em um gráfico e uma tabela.
+
+Análise de Sentimento: Uma avaliação básica do tom emocional do texto (Positivo, Negativo, Neutro).
+
+Verificação Ortográfica: Sugestões para erros de ortografia comuns.
+
+Análise ENEM: Uma avaliação detalhada baseada nas 5 competências da redação do ENEM, com pontuação estimada e feedback para cada uma.
+
+Comparador de Textos: Calcula a porcentagem de similaridade entre dois textos.
+
+Ferramentas de Limpeza: Funções para formatar o texto (maiúsculas, minúsculas, etc.) e remover espaços extras.
+
+Exportação de Relatório: Gera um arquivo .txt com um resumo completo da análise.
+
+🛠️ Como Usar
+Como esta é uma aplicação web autocontida, usá-la é muito simples:
+
+Faça o download do arquivo .html do projeto.
+
+Abra este arquivo em qualquer navegador de internet moderno (Google Chrome, Mozilla Firefox, Microsoft Edge, etc.).
+
+Pronto! A ferramenta já está funcionando e pronta para analisar seus textos.
+
+💻 Tecnologias Utilizadas
+HTML5: Estrutura da página.
+
+Tailwind CSS: Framework CSS para estilização rápida e responsiva.
+
+JavaScript (ES6+): Lógica e funcionalidades da aplicação.
+
+Chart.js: Biblioteca para a criação de gráficos.
+
+🤝 Contribuições
+Contribuições são muito bem-vindas! Se você tem sugestões para melhorar a ferramenta, sinta-se à vontade para abrir uma "issue" ou enviar um "pull request" no repositório do GitHub.
+
+📄 Licença
+Este projeto está sob a licença MIT.
+
+👤 Autor
+Sérgio [Seu Sobrenome]
+
+[Link para seu GitHub]
+
+[Link para seu LinkedIn ou outra rede social]
